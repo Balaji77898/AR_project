@@ -1,4 +1,5 @@
-import { motion, MotionProps } from 'framer-motion';
+'use client';
+import { motion, MotionProps, HTMLMotionProps } from 'framer-motion';
 import React, { ReactNode } from 'react';
 
 interface AnimatedProps extends MotionProps {
@@ -37,9 +38,10 @@ export const Animated: React.FC<AnimatedProps> = ({
   };
 
   const selected = variants[type];
+  const MotionDiv = motion.div as any;
 
   return (
-    <motion.div
+    <MotionDiv
       className={className}
       initial={selected.initial}
       animate={selected.animate}
@@ -51,6 +53,6 @@ export const Animated: React.FC<AnimatedProps> = ({
       {...motionProps}
     >
       {children}
-    </motion.div>
+    </MotionDiv>
   );
 };
