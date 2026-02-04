@@ -1,9 +1,11 @@
+'use client';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Icon } from '../components/Icon';
-import { Gradient } from '../components/Gradient';
-import { Animated } from '../components/Animated';
-import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { Icon } from '@/components/Icon';
+import { Gradient } from '@/components/Gradient';
+import { Animated } from '@/components/Animated';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigationState } from '@/contexts/NavigationContext';
 
 type TableStatus = 'available' | 'occupied' | 'reserved' | 'needs-bill';
 
@@ -18,14 +20,15 @@ type Table = {
 
 export default function Tables() {
   const { role } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { setNavState } = useNavigationState();
   const [activeFilter, setActiveFilter] = useState('all');
 
   useEffect(() => {
     if (role === 'cashier') {
-      navigate('/billing-payment');
+      router.push('/billing-payment');
     }
-  }, [role, navigate]);
+  }, [role, router]);
 
   const tables: Table[] = [
     { id: 't1', name: 'Table 1', status: 'available', seats: 2 },
@@ -90,6 +93,11 @@ export default function Tables() {
     }
   };
 
+  const handleTableClick = (item: Table) => {
+    setNavState({ table: item.name });
+    router.push('/order-details');
+  };
+
   const TableCard = ({ item, index }: { item: Table; index: number }) => {
     const config = getStatusConfig(item.status);
 
@@ -97,7 +105,7 @@ export default function Tables() {
       <Animated type="fadeInUp" delay={index * 0.08} duration={0.4}>
         <button
           className="w-full admin-card mb-3 overflow-hidden text-left group hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200"
-          onClick={() => navigate('/order-details', { state: { table: item.name } })}
+          onClick={() => handleTableClick(item)}
         >
           <div className="flex">
             <Gradient
@@ -142,14 +150,14 @@ export default function Tables() {
                 <div className="flex gap-2 mt-4 pt-4 border-t border-ivory-200">
                   <button
                     className="flex-1 bg-primary/10 hover:bg-primary hover:text-white rounded-xl py-2.5 flex items-center justify-center transition-colors group/btn"
-                    onClick={(e) => { e.stopPropagation(); navigate('/order-details'); }}
+                    onClick={(e) => { e.stopPropagation(); setNavState({ table: item.name }); router.push('/order-details'); }}
                   >
                     <Icon name="add-circle-outline" size={16} color="currentColor" className="text-primary group-hover/btn:text-white" />
                     <span className="text-primary font-semibold text-sm ml-1 group-hover/btn:text-white">Add Items</span>
                   </button>
                   <button
                     className="flex-1 bg-success/10 hover:bg-gold rounded-xl py-2.5 flex items-center justify-center transition-colors group/bill"
-                    onClick={(e) => { e.stopPropagation(); navigate('/billing-payment'); }}
+                    onClick={(e) => { e.stopPropagation(); router.push('/billing-payment'); }}
                   >
                     <Icon name="receipt-outline" size={16} color="currentColor" className="text-[#C8A951] group-hover/bill:text-white" />
                     <span className="text-[#C8A951] font-semibold text-sm ml-1 group-hover/bill:text-white">Bill</span>
@@ -183,7 +191,7 @@ export default function Tables() {
              <div className="flex gap-4">
                   <button
                      className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors backdrop-blur-md border border-white/10"
-                     onClick={() => navigate('/staff-dashboard')}
+                     onClick={() => router.push('/staff-dashboard')}
                    >
                      <Icon name="home" size={20} color="#FFFFFF" />
                    </button>

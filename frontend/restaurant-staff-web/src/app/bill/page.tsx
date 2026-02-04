@@ -1,33 +1,25 @@
-
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Icon } from '../components/Icon';
-import { Animated } from '../components/Animated';
-import { useAuth } from '../contexts/AuthContext';
+'use client';
+import { useRouter } from 'next/navigation';
+import { Icon } from '@/components/Icon';
+import { Animated } from '@/components/Animated';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigationState } from '@/contexts/NavigationContext';
 
 export default function Bill() {
   const { role } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const { navState } = useNavigationState();
 
-  const orderNumber = location.state?.orderNumber?.startsWith('#')
-    ? location.state.orderNumber
-    : `#${location.state?.orderNumber ?? '12345'}`;
-  const table = location.state?.table ?? 'Table 5';
-  const orderTotal = parseFloat(location.state?.orderTotal ?? '97.12');
-  const tipAmount = parseFloat(location.state?.tipAmount ?? '14.57');
-  const finalTotal = parseFloat(location.state?.finalTotal ?? '111.69');
-  const paymentMethod = location.state?.paymentMethod ?? 'cash';
-  const billNumber = location.state?.billNumber ?? `BILL-${Date.now().toString().slice(-8)}`;
+  const orderNumber = (navState?.orderNumber as string)?.startsWith('#')
+    ? navState.orderNumber
+    : `#${navState?.orderNumber ?? '12345'}`;
+  const table = (navState?.table as string) ?? 'Table 5';
+  const orderTotal = parseFloat((navState?.orderTotal as string) ?? '97.12');
+  const tipAmount = parseFloat((navState?.tipAmount as string) ?? '14.57');
+  const finalTotal = parseFloat((navState?.finalTotal as string) ?? '111.69');
+  const paymentMethod = (navState?.paymentMethod as string) ?? 'cash';
+  const billNumber = (navState?.billNumber as string) ?? `BILL-${Date.now().toString().slice(-8)}`;
   const date = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-
-  const getPaymentIcon = (method: string) => {
-    switch (method) {
-      case 'card': return 'card' as const;
-      case 'cash': return 'cash' as const;
-      case 'upi': return 'phone-portrait' as const;
-      default: return 'wallet' as const;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-ivory flex flex-col font-sans">
@@ -116,7 +108,7 @@ export default function Bill() {
                          </button>
                          <button
                             className="w-full bg-white border-2 border-slate-100 text-slate-700 hover:bg-slate-50 py-4 rounded-xl font-bold transition-colors"
-                            onClick={() => navigate(role === 'cashier' ? '/billing-payment' : '/staff-dashboard', { replace: true })}
+                            onClick={() => router.replace(role === 'cashier' ? '/billing-payment' : '/staff-dashboard')}
                          >
                             Back to {role === 'cashier' ? 'Billing' : 'Dashboard'}
                          </button>

@@ -1,26 +1,27 @@
+'use client';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Icon } from '../components/Icon';
-import { Gradient } from '../components/Gradient';
-import { Animated } from '../components/Animated';
-import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { Icon } from '@/components/Icon';
+import { Gradient } from '@/components/Gradient';
+import { Animated } from '@/components/Animated';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Profile() {
   const { role, logout } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
 
   const isCashier = role === 'cashier';
 
   useEffect(() => {
     if (!role) {
-      navigate('/staff-login');
+      router.push('/staff-login');
     }
-  }, [role, navigate]);
+  }, [role, router]);
 
   const handleLogout = () => {
     logout();
-    navigate('/staff-login', { replace: true });
+    router.replace('/staff-login');
   };
 
   const navItems = isCashier
@@ -72,7 +73,7 @@ export default function Profile() {
              
              <button
                 className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors backdrop-blur-md border border-white/10"
-                onClick={() => navigate('/staff-dashboard')}
+                onClick={() => router.push('/staff-dashboard')}
               >
                 <Icon name="home" size={24} color="#FFFFFF" />
               </button>

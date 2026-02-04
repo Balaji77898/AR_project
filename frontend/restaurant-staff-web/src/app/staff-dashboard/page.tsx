@@ -1,9 +1,10 @@
+'use client';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Icon } from '../components/Icon';
+import { useRouter } from 'next/navigation';
+import { Icon } from '@/components/Icon';
 
-import { Animated } from '../components/Animated';
-import { useAuth } from '../contexts/AuthContext';
+import { Animated } from '@/components/Animated';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface OrderCard {
   id: string;
@@ -16,22 +17,22 @@ interface OrderCard {
 
 export default function StaffDashboard() {
   const { role } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
 
   const isCashier = role === 'cashier';
 
   useEffect(() => {
     if (!role) {
-      navigate('/staff-login');
+      router.push('/staff-login');
     }
-  }, [role, navigate]);
+  }, [role, router]);
 
   useEffect(() => {
     if (isCashier) {
-      navigate('/billing-payment');
+      router.push('/billing-payment');
     }
-  }, [isCashier, navigate]);
+  }, [isCashier, router]);
 
   const orders: OrderCard[] = [
     { id: '1', table: 'Table 5', status: 'pending', items: 3, time: '2 min ago', amount: '₹450' },
@@ -83,7 +84,7 @@ export default function StaffDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
            {/* New Order */}
            <button 
-              onClick={() => navigate('/new-order')}
+              onClick={() => router.push('/new-order')}
               className="group bg-white rounded-[32px] p-8 shadow-card hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col items-center text-center border border-slate-100"
            >
               <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -95,7 +96,7 @@ export default function StaffDashboard() {
 
            {/* Tables */}
            <button 
-              onClick={() => navigate('/tables')}
+              onClick={() => router.push('/tables')}
               className="group bg-white rounded-[32px] p-8 shadow-card hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col items-center text-center border border-slate-100"
            >
               <div className="w-24 h-24 bg-amber-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -105,7 +106,7 @@ export default function StaffDashboard() {
            </button>
            {/* Orders / Bill */}
            <button 
-              onClick={() => navigate('/orders')}
+              onClick={() => router.push('/orders')}
               className="group bg-white rounded-[32px] p-8 shadow-card hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col items-center text-center border border-slate-100"
            >
               <div className="w-24 h-24 bg-teal-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -116,7 +117,7 @@ export default function StaffDashboard() {
 
            {/* Profile / Staff */}
            <button 
-              onClick={() => navigate('/profile')}
+              onClick={() => router.push('/profile')}
               className="group bg-white rounded-[32px] p-8 shadow-card hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col items-center text-center border border-slate-100"
            >
               <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -134,7 +135,7 @@ export default function StaffDashboard() {
                   <p className="text-slate-500">Real-time supervision of current dining service.</p>
               </div>
               <button 
-                 onClick={() => navigate('/orders')}
+                 onClick={() => router.push('/orders')}
                  className="mt-4 md:mt-0 px-6 py-3 bg-primary text-white rounded-xl font-bold transition-colors flex items-center"
               >
                   <span>View All Orders</span>
@@ -149,7 +150,7 @@ export default function StaffDashboard() {
                   <Animated key={item.id} type="fadeInUp" delay={index * 0.1} duration={0.5} className="h-full">
                     <button
                       className="w-full h-full bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-all p-5 text-left group flex flex-col justify-between"
-                      onClick={() => navigate('/order-details')}
+                      onClick={() => router.push('/order-details')}
                     >
                       <div className="flex justify-between items-start mb-4">
                          <div className="flex items-center">
