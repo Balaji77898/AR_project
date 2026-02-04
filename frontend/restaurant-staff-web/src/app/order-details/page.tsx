@@ -1,9 +1,11 @@
+'use client';
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Icon } from '../components/Icon';
+import { useRouter } from 'next/navigation';
+import { Icon } from '@/components/Icon';
 
-import { Animated } from '../components/Animated';
-import { useAuth } from '../contexts/AuthContext';
+import { Animated } from '@/components/Animated';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigationState } from '@/contexts/NavigationContext';
 
 interface OrderItem {
   id: string;
@@ -18,8 +20,8 @@ type PaymentMethod = 'cash' | 'upi';
 
 export default function OrderDetails() {
   const { role } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const { navState, setNavState } = useNavigationState();
 
   const [orderItems, setOrderItems] = useState<OrderItem[]>([
     { id: '1', name: 'Grilled Salmon', quantity: 2, price: 24.99, notes: 'No lemon', status: 'preparing' },
@@ -32,7 +34,7 @@ export default function OrderDetails() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
   const [tipAmount, setTipAmount] = useState('');
 
-  const table = location.state?.table ?? 'Table 5';
+  const table = (navState?.table as string) || 'Table 5';
 
   const statusOrder = ['pending', 'preparing', 'ready', 'served'] as const;
 
@@ -86,16 +88,17 @@ export default function OrderDetails() {
   const handleConfirmPayment = () => {
     if (!selectedPaymentMethod) return;
     setShowPaymentModal(false);
-    navigate('/bill', {
-      state: {
-        orderNumber: orderInfo.orderNumber,
-        table: orderInfo.table,
-        orderTotal: orderInfo.total.toFixed(2),
-        tipAmount: tip.toFixed(2),
-        finalTotal: finalTotal.toFixed(2),
-        paymentMethod: selectedPaymentMethod,
-      },
+    
+    setNavState({
+      orderNumber: orderInfo.orderNumber,
+      table: orderInfo.table,
+      orderTotal: orderInfo.total.toFixed(2),
+      tipAmount: tip.toFixed(2),
+      finalTotal: finalTotal.toFixed(2),
+      paymentMethod: selectedPaymentMethod,
     });
+    
+    router.push('/bill');
   };
 
   const getStatusConfig = (status: string) => {
@@ -107,10 +110,6 @@ export default function OrderDetails() {
     };
     return configs[status as keyof typeof configs] || configs.pending;
   };
-
-
-
-
 
   return (
     <div className="min-h-screen bg-ivory flex flex-col font-sans">
@@ -129,7 +128,7 @@ export default function OrderDetails() {
              <div className="flex items-center gap-4 md:gap-6 w-full md:w-auto">
                 <button
                     className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors backdrop-blur-md border border-white/10 flex-shrink-0"
-                    onClick={() => navigate(-1)}
+                    onClick={() => router.back()}
                   >
                     <Icon name="arrow-back" size={20} color="#FFFFFF" />
                   </button>

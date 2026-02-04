@@ -1,24 +1,27 @@
+'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Icon } from '../components/Icon';
-import { Animated } from '../components/Animated';
-import { useAuth } from '../contexts/AuthContext';
-import { OrderStatus, useOrders } from '../contexts/OrdersContext';
+import { useRouter } from 'next/navigation';
+import { Icon } from '@/components/Icon';
+import { Animated } from '@/components/Animated';
+import { useAuth } from '@/contexts/AuthContext';
+import { OrderStatus, useOrders } from '@/contexts/OrdersContext';
+import { useNavigationState } from '@/contexts/NavigationContext';
 
 type FilterId = 'all' | Extract<OrderStatus, 'pending' | 'preparing' | 'ready' | 'served'>;
 
 export default function Orders() {
   const { role } = useAuth();
   const { orders } = useOrders();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { setNavState } = useNavigationState();
   const [activeFilter, setActiveFilter] = useState<FilterId>('all');
 
   // Cashier cannot access orders - redirect to billing
   useEffect(() => {
     if (role === 'cashier') {
-      navigate('/billing-payment');
+      router.push('/billing-payment');
     }
-  }, [role, navigate]);
+  }, [role, router]);
 
   // Only show orders that have been accepted into the main flow
   const allOrders = useMemo(
@@ -78,6 +81,11 @@ export default function Orders() {
     }
   };
 
+  const handleOrderClick = (table: string) => {
+    setNavState({ table });
+    router.push('/order-details');
+  };
+
   const OrderCard = ({ item, index }: { item: typeof allOrders[number]; index: number }) => {
     const config = getStatusConfig(item.status);
 
@@ -85,7 +93,7 @@ export default function Orders() {
       <Animated type="fadeInUp" delay={index * 0.06} duration={0.4} className="h-full">
         <button
           className="w-full h-full admin-card mb-0 overflow-hidden text-left group hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 flex flex-col"
-          onClick={() => navigate('/order-details', { state: { table: item.table } })}
+          onClick={() => handleOrderClick(item.table)}
         >
           {/* Large Status Banner */}
           <div
@@ -157,13 +165,13 @@ export default function Orders() {
             <div className="flex gap-4">
                  <button
                     className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors backdrop-blur-md border border-white/10"
-                    onClick={() => navigate('/staff-dashboard')}
+                    onClick={() => router.push('/staff-dashboard')}
                   >
                     <Icon name="home" size={20} color="#FFFFFF" />
                   </button>
-                  <button
+                   <button
                     className="bg-gold hover:bg-yellow-500 text-white px-5 py-2 md:px-6 md:py-3 rounded-xl font-bold transition-colors flex items-center shadow-lg transform hover:-translate-y-0.5 text-sm md:text-base"
-                    onClick={() => navigate('/new-order')}
+                    onClick={() => router.push('/new-order')}
                   >
                     <Icon name="add" size={20} color="#FFFFFF" className="mr-2" />
                     New Order

@@ -1,10 +1,10 @@
+'use client';
+import Link from 'next/link';
+import { Icon } from '@/components/Icon';
+import { Gradient } from '@/components/Gradient';
+import { Animated } from '@/components/Animated';
 
-import { Link } from 'react-router-dom';
-import { Icon } from '../components/Icon';
-import { Gradient } from '../components/Gradient';
-import { Animated } from '../components/Animated';
-
-export default function IndexPage() {
+export default function Home() {
   return (
     <div className="min-h-screen bg-ivory flex items-center justify-center relative overflow-hidden p-4">
       {/* Gradient Background */}
@@ -87,7 +87,7 @@ export default function IndexPage() {
 
             {/* Login Button */}
             <Animated type="fadeInUp" delay={0.8} duration={0.6} className="w-full">
-              <Link to="/staff-login">
+              <Link href="/staff-login">
                 <button className="w-full overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
                   <Gradient
                     colors={['#7B1F1F', '#9B2B2B']}

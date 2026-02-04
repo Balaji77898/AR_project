@@ -1,13 +1,14 @@
+'use client';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Icon } from '../components/Icon';
+import { useRouter } from 'next/navigation';
+import { Icon } from '@/components/Icon';
 
-import { Animated } from '../components/Animated';
-import { useAuth, StaffRole } from '../contexts/AuthContext';
+import { Animated } from '@/components/Animated';
+import { useAuth, StaffRole } from '@/contexts/AuthContext';
 
 export default function StaffLogin() {
   const { setRole } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   
   const [staffId, setStaffId] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +19,7 @@ export default function StaffLogin() {
   const handleLogin = () => {
     if (!selectedRole) return;
     setRole(selectedRole);
-    navigate('/staff-dashboard');
+    router.push('/staff-dashboard');
   };
 
   return (

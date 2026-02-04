@@ -1,28 +1,37 @@
+'use client';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Icon } from '../components/Icon';
-import { Gradient } from '../components/Gradient';
-import { Animated } from '../components/Animated';
-import { useAuth } from '../contexts/AuthContext';
-import { useOrders } from '../contexts/OrdersContext';
+import { useRouter } from 'next/navigation';
+import { Icon } from '@/components/Icon';
+import { Gradient } from '@/components/Gradient';
+import { Animated } from '@/components/Animated';
+import { useAuth } from '@/contexts/AuthContext';
+import { useOrders } from '@/contexts/OrdersContext';
+import { useNavigationState } from '@/contexts/NavigationContext';
 
 export default function NewOrder() {
   const { role } = useAuth();
   const { orders, setOrderStatus } = useOrders();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { setNavState } = useNavigationState();
 
   useEffect(() => {
     if (role === 'cashier') {
-      navigate('/billing-payment');
+      router.push('/billing-payment');
     }
-  }, [role, navigate]);
+  }, [role, router]);
 
   const newOrders = orders.filter((o) => o.status === 'new');
   const acceptedCount = orders.filter((o) => o.status !== 'new').length;
 
   const acceptOrder = (itemId: string, table: string) => {
     setOrderStatus(itemId, 'pending');
-    navigate('/order-details', { state: { table } });
+    setNavState({ table });
+    router.push('/order-details');
+  };
+
+  const handleDetailsClick = (table: string) => {
+    setNavState({ table });
+    router.push('/order-details');
   };
 
   const OrderCard = ({ item, index }: { item: (typeof orders)[number]; index: number }) => {
@@ -72,7 +81,7 @@ export default function NewOrder() {
           {/* Card Content */}
           <button
             className="w-full p-5 text-left"
-            onClick={() => !isNew && navigate('/order-details', { state: { table: item.table } })}
+            onClick={() => !isNew && handleDetailsClick(item.table)}
           >
             {/* Table & Amount */}
             <div className="flex justify-between items-start mb-5">
@@ -145,7 +154,7 @@ export default function NewOrder() {
             <div className="px-5 pb-5">
               <div
                 className="w-full bg-surface-100 hover:bg-surface-200 rounded-2xl overflow-hidden transition-colors group"
-                onClick={() => navigate('/order-details', { state: { table: item.table } })}
+                onClick={() => handleDetailsClick(item.table)}
               >
                 <button className="w-full py-4 flex items-center justify-center">
                   <span className="text-text font-bold text-base mr-2">
@@ -186,11 +195,11 @@ export default function NewOrder() {
             <div className="flex gap-4">
                  <button
                     className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors backdrop-blur-md border border-white/10"
-                    onClick={() => navigate(-1)}
+                    onClick={() => router.back()}
                   >
                     <Icon name="arrow-back" size={20} color="#FFFFFF" />
                   </button>
-                  <button
+                   <button
                     className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors backdrop-blur-md border border-white/10"
                     onClick={() => window.location.reload()}
                   >

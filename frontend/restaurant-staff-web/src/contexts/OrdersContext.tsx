@@ -1,3 +1,4 @@
+'use client';
 import React, { createContext, useContext, useMemo, useState, ReactNode } from 'react';
 
 export type OrderStatus = 'new' | 'pending' | 'preparing' | 'ready' | 'served';

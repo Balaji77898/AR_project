@@ -1,9 +1,11 @@
+'use client';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Icon } from '../components/Icon';
-import { Gradient } from '../components/Gradient';
-import { Animated } from '../components/Animated';
-import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { Icon } from '@/components/Icon';
+import { Gradient } from '@/components/Gradient';
+import { Animated } from '@/components/Animated';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigationState } from '@/contexts/NavigationContext';
 
 type BillingStatus = 'unpaid' | 'pending' | 'paid';
 type PaymentMethod = 'cash' | 'upi';
@@ -20,7 +22,8 @@ interface TableBilling {
 
 export default function BillingPayment() {
   const { role } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { setNavState } = useNavigationState();
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod | null>(null);
@@ -30,9 +33,9 @@ export default function BillingPayment() {
 
   useEffect(() => {
     if (role === 'server') {
-      navigate('/staff-dashboard');
+      router.push('/staff-dashboard');
     }
-  }, [role, navigate]);
+  }, [role, router]);
 
   const allTablesBilling: TableBilling[] = [
     { id: '1', table: 'Table 1', items: 4, total: 560, status: 'paid', time: '10:30 AM' },
@@ -122,16 +125,17 @@ export default function BillingPayment() {
     const tip = parseFloat(tipAmount) || 0;
     const finalTotal = tableForPayment.total + taxAmount + tip;
     setShowPaymentModal(false);
-    navigate('/bill', {
-      state: {
-        orderNumber: tableForPayment.id,
-        table: tableForPayment.table,
-        orderTotal: (tableForPayment.total + taxAmount).toFixed(2),
-        tipAmount: tip.toFixed(2),
-        finalTotal: finalTotal.toFixed(2),
-        paymentMethod: selectedPaymentMethod
-      }
+    
+    setNavState({
+      orderNumber: tableForPayment.id,
+      table: tableForPayment.table,
+      orderTotal: (tableForPayment.total + taxAmount).toFixed(2),
+      tipAmount: tip.toFixed(2),
+      finalTotal: finalTotal.toFixed(2),
+      paymentMethod: selectedPaymentMethod
     });
+
+    router.push('/bill');
   };
 
   const calculateTipFromPercent = (percent: number) => {
@@ -223,7 +227,7 @@ export default function BillingPayment() {
             <div className="flex gap-4">
                  <button
                     className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors backdrop-blur-md border border-white/10"
-                    onClick={() => navigate('/staff-dashboard')}
+                    onClick={() => router.push('/staff-dashboard')}
                   >
                     <Icon name="home" size={24} color="#FFFFFF" />
                   </button>
@@ -235,7 +239,7 @@ export default function BillingPayment() {
                   </button>
                    <button
                     className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-colors backdrop-blur-md border border-white/10"
-                    onClick={() => navigate('/profile')}
+                    onClick={() => router.push('/profile')}
                   >
                     <Icon name="person" size={24} color="#FFFFFF" />
                   </button>
